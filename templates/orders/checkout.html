@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+   <div class="checkout-container">
+      <h1 class="checkout-title mb-5">Checkout</h1>
+      <div class="checkout-form">
+         <form method="post">
+            {% csrf_token %}
+            <div class="row col-md-6">
+               <div class="form-section mb-5">
+                  <h3 class="mb-4">Contact & Payment</h3>
+                  <div class="row">
+                     <div class="col-md-6">{{ form.phone|as_crispy_field }}</div>
+                     <div class="col-md-6">{{ form.payment_method|as_crispy_field }}</div>
+                  </div>
+               </div>
+
+               <div class="form-section mb-5">
+                  <h3 class="mb-4">Shipping Address</h3>
+                  {{ form.shipping_address|as_crispy_field }}
+               </div>
+            </div>
+
+            <div class="order-summary mb-5">
+               <h3 class="mb-4">Order Summary</h3>
+               <div class="summary-table-wrapper">
+                  <table class="order-table">
+                     <thead>
+                        <tr>
+                           <th>Item</th>
+                           <th>Quantity</th>
+                           <th>Price</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {% for item in cart.items.all %}
+                           <tr>
+                              <td>{{ item.book.title }}</td>
+                              <td class="text-center">{{ item.quantity }}</td>
+                              <td class="text-right">${{ item.book.price }}</td>
+                           </tr>
+                        {% endfor %}
+                     </tbody>
+                     <tfoot>
+                        <tr class="total-row">
+                           <td colspan="2">
+                              <strong>Total:</strong>
+                           </td>
+                           <td class="text-right">
+                              <strong>${{ cart.total_price }}</strong>
+                           </td>
+                        </tr>
+                     </tfoot>
+                  </table>
+               </div>
+            </div>
+
+            <div class="checkout-actions">
+               <button type="submit" class="btn btn-primary btn-lg">Place Order</button>
+            </div>
+         </form>
+      </div>
+   </div>
+{% endblock content %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+   <div class="container mt-4">
+      <div class="row">
+         <div class="col-md-4">
+            {% if book.image %}
+               <img src="{{ book.image.url }}"
+                    class="img-fluid book-detail-image"
+                    alt="{{ book.title }}"
+                    width="400"
+                    height="500" />
+            {% else %}
+               <div class="book-detail-placeholder">
+                  <i class="fas fa-book fa-5x text-muted"></i>
+               </div>
+            {% endif %}
+         </div>
+         <div class="col-md-8">
+            <h1>{{ book.title }}</h1>
+            <h3 class="text-muted">by {{ book.author }}</h3>
+            <p class="mt-4">{{ book.description }}</p>
+            <p>
+               <strong>Category:</strong> {{ book.category.name|default:"Uncategorized" }}
+            </p>
+            <p>
+               <strong>Price:</strong> ${{ book.price }}
+            </p>
+            <p>
+               <strong>Stock:</strong> {{ book.stock }}
+            </p>
+
+            {% if user.is_authenticated %}
+               {% if is_purchased %}
+                  <div class="mt-4">
+                     <h4>Write a Review</h4>
+                     <form method="post" action="{% url 'add_book_review' book.id %}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                     </form>
+                  </div>
+               {% else %}
+                  <a href="{% url 'add_to_cart' book.id %}" class="btn btn-primary">Add to Cart</a>
+               {% endif %}
+            {% else %}
+               <p class="text-muted">
+                  Please <a href="{% url 'login' %}">login</a> to purchase this book or write a review.
+               </p>
+            {% endif %}
+         </div>
+      </div>
+
+      <div class="row mt-4">
+         <div class="col-12">
+            <h3>Reviews</h3>
+            {% for review in reviews %}
+               <div class="card mb-3">
+                  <div class="card-body">
+                     <h5 class="card-title">{{ review.user.username }}</h5>
+                     <div class="mb-2">
+                        {% for i in "12345"|make_list %}
+                           {% if forloop.counter <= review.rating %}
+                              <i class="fas fa-star text-warning"></i>
+                           {% else %}
+                              <i class="far fa-star text-warning"></i>
+                           {% endif %}
+                        {% endfor %}
+                     </div>
+                     <p class="card-text">{{ review.comment }}</p>
+                     <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
+                  </div>
+               </div>
+            {% empty %}
+               <p>No reviews yet.</p>
+            {% endfor %}
+         </div>
+      </div>
+   </div>
+
+   <style>
+    .book-detail-image {
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    .book-detail-placeholder {
+        height: 500px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+    }
+   </style>
+{% endblock content %}

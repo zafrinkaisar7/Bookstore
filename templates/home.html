@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+   <!-- Hero Section -->
+   <div class="hero-section"
+        style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{% static 'images/homejpg.jpeg' %}')">
+      <div class="hero-content">
+         <h1 class="text-white">Welcome to GreenBook</h1>
+         <p class="lead text-white">Your Gateway to a World of Stories</p>
+         <a href="{% url 'book_list' %}" class="btn btn-custom btn-lg">Explore Books</a>
+      </div>
+   </div>
+
+   <!-- Welcome Message -->
+   <div class="container mt-4">
+      {% if user.is_authenticated %}
+         <h2>Welcome, {{ user.username }}!</h2>
+      {% else %}
+         <h2>Welcome to GreenBook!</h2>
+      {% endif %}
+   </div>
+
+   <style>
+   .btn-custom {
+      background-color: rgba(255, 255, 255, 0.2);  /* Semi-transparent white */
+      backdrop-filter: blur(5px);  /* Blur effect */
+      border: 2px solid #000000;  /* Black border */
+      color: #000000;  /* Black text */
+      transition: all 0.3s ease;
+      font-weight: 500;
+   }
+   
+   .btn-custom:hover {
+      background-color: rgba(255, 255, 255, 0.3);  /* Slightly more opaque on hover */
+      border-color: #000000;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+   }
+   </style>
+{% endblock content %}

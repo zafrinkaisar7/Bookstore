@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+   <div class="thank-you-container">
+      <h1>Thank You for Your Order!</h1>
+      <div class="order-confirmation">
+         <h3>Order #{{ order.id }}</h3>
+         <p>Your order has been successfully placed and is being processed.</p>
+
+         <div class="order-details">
+            <h4 class="mb-4">Order Details:</h4>
+            <p class="mb-3">
+               <strong>Order Date:</strong> {{ order.order_date|date:"F j, Y" }}
+            </p>
+            <p class="mb-3">
+               <strong>Shipping Address:</strong> {{ order.shipping_address }}
+            </p>
+            <p class="mb-4">
+               <strong>Payment Method:</strong> {{ order.get_payment_method_display }}
+            </p>
+
+            <h4 class="mb-4">Order Items:</h4>
+            <table class="order-items table">
+               <tr>
+                  <th class="py-3">Book</th>
+                  <th class="py-3">Quantity</th>
+                  <th class="py-3">Price</th>
+                  <th class="py-3">Total</th>
+               </tr>
+               {% for item in order.items.all %}
+                  <tr>
+                     <td class="py-3">{{ item.book.title }}</td>
+                     <td class="py-3">{{ item.quantity }}</td>
+                     <td class="py-3">${{ item.price }}</td>
+                     <td class="py-3">${{ item.total_price }}</td>
+                  </tr>
+               {% endfor %}
+            </table>
+         </div>
+
+         <div class="next-steps">
+            <p>A confirmation email will be sent to your registered email address.</p>
+            <a href="{% url 'home' %}" class="btn btn-primary">Continue Shopping</a>
+         </div>
+      </div>
+   </div>
+{% endblock content %}

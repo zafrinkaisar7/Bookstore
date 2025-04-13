@@ -1,0 +1,103 @@
+.quantity-input {
+   width: 120px;
+}
+
+.book-card-img-container {
+   height: 300px;
+   overflow: hidden;
+}
+
+.book-card-img {
+   object-fit: cover;
+}
+
+/* Hero Section Styles */
+.hero-section {
+   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      url('{% https://www.google.com/imgres?q=ghibli%20bookstore%20background%20image&imgurl=https%3A%2F%2Fimg.freepik.com%2Fpremium-photo%2Fghibli-studio-inspired-background_931878-271806.jpg&imgrefurl=https%3A%2F%2Fwww.freepik.com%2Fpremium-ai-image%2Fghibli-studio-inspired-background_76154021.htm&docid=-IfjphMDCdQA9M&tbnid=R4xTLIZeo5swZM&vet=12ahUKEwiSn7fVxtWMAxXae_UHHeRYB34QM3oECBkQAA..i&w=626&h=313&hcb=2&ved=2ahUKEwiSn7fVxtWMAxXae_UHHeRYB34QM3oECBkQAA" %}');
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+   height: 60vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   color: white;
+   margin-bottom: 2rem;
+}
+
+.hero-content {
+   max-width: 800px;
+   padding: 2rem;
+}
+
+.hero-content h1 {
+   font-size: 3.5rem;
+   font-weight: bold;
+   margin-bottom: 1rem;
+   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-content .lead {
+   font-size: 1.5rem;
+   margin-bottom: 2rem;
+   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.hero-content .btn {
+   padding: 0.75rem 2rem;
+   font-size: 1.25rem;
+   border-radius: 30px;
+   text-transform: uppercase;
+   letter-spacing: 1px;
+   transition: all 0.3s ease;
+}
+
+.hero-content .btn:hover {
+   transform: translateY(-3px);
+   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Base styles */
+body {
+   background-color: #ffffff;
+   color: #333333;
+   min-height: 100vh;
+}
+
+.navbar {
+   background-color: #f8f9fa !important;
+   color: #333333 !important;
+}
+
+.navbar a {
+   color: #333333 !important;
+}
+
+.card {
+   background-color: #ffffff !important;
+   border-color: #dee2e6 !important;
+   color: #333333 !important;
+}
+
+.card-title,
+.card-text,
+.text-muted {
+   color: #333333 !important;
+}
+
+a {
+   color: #007bff !important;
+}
+
+.btn-primary {
+   background-color: #007bff !important;
+   border-color: #007bff !important;
+}
+
+.btn-primary:hover {
+   background-color: #f8f9fa !important;
+   border-color: #007bff !important;
+   color: #007bff !important;
+}

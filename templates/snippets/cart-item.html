@@ -1,0 +1,50 @@
+{% load math_filters %}
+
+<tr>
+   <td>
+      <img src="{{ item.book.image.url }}"
+           alt="{{ item.book.title }}"
+           class="img-thumbnail"
+           width="140"
+           height="200" />
+   </td>
+   <td class="align-middle">
+      {{ item.book.title }}
+      <br />
+      <small class="text-muted">by {{ item.book.author }}</small>
+   </td>
+   <td class="align-middle text-center">
+      <div class="input-group mx-auto quantity-input">
+         <form action="{% url 'update_quantity' item.id %}"
+               method="post"
+               class="d-flex">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="decrease" />
+            <button class="btn btn-outline-secondary" type="submit">-</button>
+         </form>
+         <input type="number"
+                class="form-control text-center"
+                value="{{ item.quantity }}"
+                min="1"
+                readonly />
+         <form action="{% url 'update_quantity' item.id %}"
+               method="post"
+               class="d-flex">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="increase" />
+            <button class="btn btn-outline-secondary" type="submit">+</button>
+         </form>
+      </div>
+   </td>
+   <td class="align-middle">${{ item.book.price }}</td>
+   <td class="align-middle">${{ item.book.price|multiply:item.quantity }}</td>
+   <td class="align-middle">
+      <form action="{% url 'update_quantity' item.id %}" method="post">
+         {% csrf_token %}
+         <input type="hidden" name="action" value="delete" />
+         <button type="submit" class="btn btn-danger btn-sm">
+            <i class="fas fa-trash"></i>
+         </button>
+      </form>
+   </td>
+</tr>

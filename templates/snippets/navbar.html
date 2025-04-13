@@ -1,0 +1,58 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+   <div class="container py-2 w-100">
+      <div class="w-100 d-flex justify-content-between align-items-center">
+         <a class="navbar-brand" href="{% url 'home' %}">GreenBook</a>
+
+         <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav w-100 d-flex justify-content-between">
+               <div class="d-flex gap-2 w-100">
+                  {% if user.is_authenticated %}
+                     <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' user.id %}">Profile</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_list' %}">Books</a>
+                     </li>
+                     {% if not user.is_superuser %}
+                        <li class="nav-item">
+                           <a class="nav-link" href="{% url 'cart' %}">Cart ({{ user.cart.total_items|default:0 }})</a>
+                        </li>
+                     {% else %}
+                        <li class="nav-item">
+                           <a class="nav-link" href="{% url 'manage_books' %}">Manage Books</a>
+                        </li>
+                     {% endif %}
+                  </div>
+               {% else %}
+                  <div class="d-flex gap-2 w-100 justify-content-end">
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+                     </li>
+                  </div>
+               {% endif %}
+            </ul>
+         </div>
+      </div>
+
+      {% if user.is_authenticated %}
+         <form class="d-flex col-3"
+               role="search"
+               method="get"
+               action="{% url 'book_list' %}">
+            <input class="form-control me-2"
+                   type="search"
+                   placeholder="Search for books"
+                   aria-label="Search"
+                   name="q"
+                   value="{{ request.GET.q|default:'' }}" />
+            <button class="btn btn-outline-success" type="submit">Search</button>
+         </form>
+      {% endif %}
+   </div>
+</nav>
