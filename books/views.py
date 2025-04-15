@@ -3,9 +3,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from orders.models import OrderItem
 from .forms import BookForm, ReviewForm
 from .models import Book, Review, Category
+from django.contrib import messages
+from customers.models import Cart, CartItem
 
 
 # Create your views here.
+def check_purchased(request, book_id):
+    if not request.user.is_authenticated:
+        return False
+    return OrderItem.objects.filter(order__customer__user=request.user, book_id=book_id).exists()
+
+
 def add_book(request):
     # only superusers can add books
     if not request.user.is_superuser:
@@ -42,13 +50,24 @@ def update_book(request, pk):
 def book_list(request):
     categories = Category.objects.all()
     selected_category = request.GET.get("category")
+    search_query = request.GET.get("q", "")
 
+    books = Book.objects.all()
     if selected_category:
-        books = Book.objects.filter(category_id=selected_category)
-    else:
-        books = Book.objects.all()
+        books = books.filter(category_id=selected_category)
+    if search_query:
+        books = books.filter(title__icontains=search_query)
 
-    context = {"books": books, "categories": categories, "selected_category": selected_category}
+    # Calculate total value of displayed books
+    total_value = sum(book.price for book in books)
+
+    context = {
+        "books": books,
+        "categories": categories,
+        "selected_category": selected_category,
+        "search_query": search_query,
+        "total_value": total_value,
+    }
     return render(request, "books/book_list.html", context)
 
 
@@ -87,8 +106,42 @@ def add_book_review(request, pk):
     return redirect("book_detail", pk=pk)
 
 
-def check_purchased(request, book_pk):
-    return OrderItem.objects.filter(order__customer__user=request.user, book__pk=book_pk).exists()
+@login_required
+def submit_review(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+
+    # Check if user has purchased this book
+    if not check_purchased(request, pk):
+        messages.error(request, "You must purchase this book before reviewing it.")
+        return redirect("book_detail", book_id=pk)
+
+    # Check if user has already reviewed this book
+    if Review.objects.filter(book=book, user=request.user).exists():
+        messages.error(request, "You have already reviewed this book.")
+        return redirect("book_detail", book_id=pk)
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.book = book
+            review.user = request.user
+            review.save()
+            messages.success(request, "Your review has been submitted!")
+            return redirect("book_detail", book_id=pk)
+    else:
+        form = ReviewForm()
+
+    return render(
+        request,
+        "books/book_detail.html",
+        {
+            "book": book,
+            "form": form,
+            "reviews": Review.objects.filter(book=book),
+            "is_purchased": True,
+        },
+    )
 
 
 @login_required

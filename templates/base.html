@@ -27,42 +27,46 @@
 
       <style>
          :root {
-            --bg-color: #fff;
-            --text-color: #000;
-            --card-bg: #fff;
-            --border-color: #dee2e6;
-            --btn-bg: #fff;
-            --btn-border: #dee2e6;
-            --btn-text: #000;
-            --btn-hover-bg: #f8f9fa;
-            --btn-hover-border: #d3d9df;
-            --btn-active-bg: #e9ecef;
-            --btn-active-border: #d3d9df;
+            --bg-color: #ffd6e7;
+            --text-color: #4a4a4a;
+            --card-bg: #ffffff;
+            --border-color: #ff85b3;
+            --btn-bg: #ffffff;
+            --btn-border: #ff85b3;
+            --btn-text: #4a4a4a;
+            --btn-hover-bg: #fff0f5;
+            --btn-hover-border: #ff85b3;
+            --btn-active-bg: #ffe4e9;
+            --btn-active-border: #ff85b3;
+            --primary-color: #ff85b3;
+            --secondary-color: #ffd6e7;
          }
 
          [data-theme="dark"] {
-            --bg-color: #212529;
-            --text-color: #f8f9fa;
-            --card-bg: #2c3034;
-            --border-color: #495057;
-            --btn-bg: #2c3034;
-            --btn-border: #495057;
-            --btn-text: #f8f9fa;
-            --btn-hover-bg: #343a40;
-            --btn-hover-border: #6c757d;
-            --btn-active-bg: #495057;
-            --btn-active-border: #6c757d;
+            --bg-color: #2c1a24;
+            --text-color: #fff0f5;
+            --card-bg: #3a232f;
+            --border-color: #ff85b3;
+            --btn-bg: #3a232f;
+            --btn-border: #ff85b3;
+            --btn-text: #fff0f5;
+            --btn-hover-bg: #4a2d3a;
+            --btn-hover-border: #ff85b3;
+            --btn-active-bg: #5a3745;
+            --btn-active-border: #ff85b3;
          }
 
          body {
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
          }
 
          .card {
             background-color: var(--card-bg);
             border-color: var(--border-color);
+            box-shadow: 0 2px 4px rgba(255, 133, 179, 0.1);
          }
 
          .table {
@@ -124,6 +128,57 @@
 
          .cart-text {
             color: var(--text-color);
+         }
+
+         .navbar {
+            background-color: var(--card-bg) !important;
+            border-bottom: 1px solid var(--border-color);
+         }
+
+         .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: bold;
+         }
+
+         .nav-link {
+            color: var(--text-color) !important;
+         }
+
+         .nav-link:hover {
+            color: var(--primary-color) !important;
+         }
+
+         .nav-link.active {
+            color: var(--primary-color) !important;
+         }
+
+         .badge {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+         }
+
+         .alert {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+         }
+
+         .alert-info {
+            background-color: var(--secondary-color);
+            border-color: var(--primary-color);
+         }
+
+         .text-primary {
+            color: var(--primary-color) !important;
+         }
+
+         .text-success {
+            color: #28a745 !important;
+         }
+
+         .text-danger {
+            color: #dc3545 !important;
          }
 
          .dark-mode-toggle {

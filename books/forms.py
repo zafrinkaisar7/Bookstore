@@ -12,6 +12,16 @@ class BookForm(forms.ModelForm):
 
 
 class ReviewForm(forms.ModelForm):
+    rating = forms.ChoiceField(
+        choices=Review.RATING_CHOICES,
+        widget=forms.RadioSelect(attrs={"class": "star-rating"}),
+        label="Rating",
+    )
+    comment = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 4, "placeholder": "Write your review here..."}),
+        label="Review",
+    )
+
     class Meta:
         model = Review
         fields = ["rating", "comment"]

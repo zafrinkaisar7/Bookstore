@@ -5,94 +5,222 @@
 {% block content %}
    <div class="container mt-4">
       <div class="row">
+         <!-- Book Image Section -->
          <div class="col-md-4">
-            {% if book.image %}
-               <img src="{{ book.image.url }}"
-                    class="img-fluid book-detail-image"
-                    alt="{{ book.title }}"
-                    width="400"
-                    height="500" />
-            {% else %}
-               <div class="book-detail-placeholder">
-                  <i class="fas fa-book fa-5x text-muted"></i>
+            <div class="card shadow-sm">
+               <div class="card-body p-0">
+                  {% if book.image %}
+                     <img src="{{ book.image.url }}"
+                          class="img-fluid book-detail-image"
+                          alt="{{ book.title }}"
+                          width="500"
+                          height="500" />
+                  {% else %}
+                     <div class="book-detail-placeholder">
+                        <i class="fas fa-book fa-5x text-muted"></i>
+                     </div>
+                  {% endif %}
                </div>
-            {% endif %}
+            </div>
          </div>
-         <div class="col-md-8">
-            <h1>{{ book.title }}</h1>
-            <h3 class="text-muted">by {{ book.author }}</h3>
-            <p class="mt-4">{{ book.description }}</p>
-            <p>
-               <strong>Category:</strong> {{ book.category.name|default:"Uncategorized" }}
-            </p>
-            <p>
-               <strong>Price:</strong> ${{ book.price }}
-            </p>
-            <p>
-               <strong>Stock:</strong> {{ book.stock }}
-            </p>
 
-            {% if user.is_authenticated %}
-               {% if is_purchased %}
-                  <div class="mt-4">
-                     <h4>Write a Review</h4>
-                     <form method="post" action="{% url 'add_book_review' book.id %}">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary">Submit Review</button>
-                     </form>
+         <!-- Book Details Section -->
+         <div class="col-md-8">
+            <div class="card shadow-sm">
+               <div class="card-body">
+                  <h1 class="card-title">{{ book.title }}</h1>
+                  <h3 class="text-muted mb-4">by {{ book.author }}</h3>
+
+                  <div class="book-meta mb-4">
+                     <span class="badge bg-primary me-2">{{ book.category.name|default:"Uncategorized" }}</span>
+                     <span class="badge bg-{% if book.stock > 0 %}success{% else %}danger{% endif %}">
+                        {% if book.stock > 0 %}
+                           In Stock
+                        {% else %}
+                           Out of Stock
+                        {% endif %}
+                     </span>
                   </div>
-               {% else %}
-                  <a href="{% url 'add_to_cart' book.id %}" class="btn btn-primary">Add to Cart</a>
-               {% endif %}
-            {% else %}
-               <p class="text-muted">
-                  Please <a href="{% url 'login' %}">login</a> to purchase this book or write a review.
-               </p>
-            {% endif %}
+
+                  <div class="book-price mb-4">
+                     <h2 class="text-primary">${{ book.price }}</h2>
+                  </div>
+
+                  <p class="card-text book-description">{{ book.description }}</p>
+
+                  <div class="book-actions mt-4">
+                     {% if user.is_authenticated %}
+                        {% if is_purchased %}
+                           <div class="mt-4">
+                              <h4>Write a Review</h4>
+                              <form method="post"
+                                    action="{% url 'submit_review' book.id %}"
+                                    class="review-form">
+                                 {% csrf_token %}
+                                 {{ form|crispy }}
+                                 <button type="submit" class="btn btn-primary">Submit Review</button>
+                              </form>
+                           </div>
+                        {% else %}
+                           {% if book.stock > 0 %}
+                              <a href="{% url 'add_to_cart' book.id %}" class="btn btn-outline-dark">
+                                 <i class="fas fa-shopping-cart"></i> Add to Cart
+                              </a>
+                           {% else %}
+                              <button class="btn btn-outline-dark" disabled>
+                                 <i class="fas fa-shopping-cart"></i> Out of Stock
+                              </button>
+                           {% endif %}
+                        {% endif %}
+                     {% else %}
+                        <div class="alert alert-info">
+                           <i class="fas fa-info-circle"></i>
+                           Please <a href="{% url 'login' %}" class="alert-link">login</a> to purchase this book or write a review.
+                        </div>
+                     {% endif %}
+                  </div>
+               </div>
+            </div>
          </div>
       </div>
 
+      <!-- Reviews Section -->
       <div class="row mt-4">
          <div class="col-12">
-            <h3>Reviews</h3>
-            {% for review in reviews %}
-               <div class="card mb-3">
-                  <div class="card-body">
-                     <h5 class="card-title">{{ review.user.username }}</h5>
-                     <div class="mb-2">
-                        {% for i in "12345"|make_list %}
-                           {% if forloop.counter <= review.rating %}
-                              <i class="fas fa-star text-warning"></i>
-                           {% else %}
-                              <i class="far fa-star text-warning"></i>
-                           {% endif %}
-                        {% endfor %}
+            <div class="card shadow-sm">
+               <div class="card-body">
+                  <h3 class="card-title mb-4">Reviews</h3>
+                  {% for review in reviews %}
+                     <div class="review-card mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                           <h5 class="mb-0">{{ review.user.username }}</h5>
+                           <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
+                        </div>
+                        <div class="rating mb-2">
+                           {% for i in "12345"|make_list %}
+                              {% if forloop.counter <= review.rating %}
+                                 <i class="fas fa-star text-warning"></i>
+                              {% else %}
+                                 <i class="far fa-star text-warning"></i>
+                              {% endif %}
+                           {% endfor %}
+                        </div>
+                        <p class="card-text">{{ review.comment }}</p>
                      </div>
-                     <p class="card-text">{{ review.comment }}</p>
-                     <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
-                  </div>
+                  {% empty %}
+                     <div class="text-center py-4">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No reviews yet. Be the first to review this book!</p>
+                     </div>
+                  {% endfor %}
                </div>
-            {% empty %}
-               <p>No reviews yet.</p>
-            {% endfor %}
+            </div>
          </div>
       </div>
    </div>
 
    <style>
-    .book-detail-image {
-        object-fit: cover;
-        border-radius: 4px;
-    }
-    
-    .book-detail-placeholder {
-        height: 500px;
-        background-color: #f8f9fa;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-    }
+      .book-detail-image {
+         width: 100%;
+         height: 500px;
+         object-fit: cover;
+         border-radius: 4px;
+      }
+      
+      .book-detail-placeholder {
+         height: 500px;
+         background-color: #f8f9fa;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 4px;
+      }
+
+      .book-meta .badge {
+         font-size: 1rem;
+         padding: 0.5em 1em;
+      }
+
+      .book-description {
+         font-size: 1.1rem;
+         line-height: 1.6;
+         color: #444;
+      }
+
+      .review-card {
+         padding: 1.5rem;
+         border-radius: 8px;
+         background-color: #f8f9fa;
+         transition: transform 0.2s;
+      }
+
+      .review-card:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+
+      .rating {
+         font-size: 1.2rem;
+      }
+
+      .btn {
+         padding: 0.5rem 1.5rem;
+         font-weight: 500;
+      }
+
+      .card {
+         border: none;
+         border-radius: 8px;
+      }
+
+      .card-body {
+         padding: 2rem;
+      }
+
+      /* Star Rating Styles */
+      .star-rating {
+         display: flex;
+         flex-direction: row-reverse;
+         justify-content: flex-end;
+         gap: 5px;
+         margin-bottom: 1rem;
+      }
+
+      .star-rating input[type="radio"] {
+         display: none;
+      }
+
+      .star-rating label {
+         font-size: 1.5rem;
+         color: #ddd;
+         cursor: pointer;
+         transition: color 0.2s;
+      }
+
+      .star-rating label:hover,
+      .star-rating label:hover ~ label,
+      .star-rating input[type="radio"]:checked ~ label {
+         color: #ffc107;
+      }
+
+      .review-form {
+         max-width: 600px;
+         margin: 0 auto;
+      }
+
+      .review-form .form-group {
+         margin-bottom: 1.5rem;
+      }
+
+      .review-form textarea {
+         resize: vertical;
+         min-height: 100px;
+      }
+
+      .review-form .btn-primary {
+         width: 100%;
+         padding: 0.75rem;
+         font-size: 1.1rem;
+      }
    </style>
 {% endblock content %}
