@@ -30,6 +30,15 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def is_out_of_stock(self):
+        return self.stock <= 2
+
+    def get_stock_status(self):
+        if self.stock <= 2:
+            return "Out of Stock"
+        return f"In Stock ({self.stock} available)"
+
 
 class Review(models.Model):
     RATING_CHOICES = (

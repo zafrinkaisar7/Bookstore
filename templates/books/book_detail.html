@@ -33,8 +33,8 @@
 
                   <div class="book-meta mb-4">
                      <span class="badge bg-primary me-2">{{ book.category.name|default:"Uncategorized" }}</span>
-                     <span class="badge bg-{% if book.stock > 0 %}success{% else %}danger{% endif %}">
-                        {% if book.stock > 0 %}
+                     <span class="badge bg-{% if book.stock > 2 %}success{% else %}danger{% endif %}">
+                        {% if book.stock > 2 %}
                            In Stock
                         {% else %}
                            Out of Stock
@@ -62,7 +62,7 @@
                               </form>
                            </div>
                         {% else %}
-                           {% if book.stock > 0 %}
+                           {% if book.stock > 2 %}
                               <a href="{% url 'add_to_cart' book.id %}" class="btn btn-outline-dark">
                                  <i class="fas fa-shopping-cart"></i> Add to Cart
                               </a>
