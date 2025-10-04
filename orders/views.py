@@ -42,18 +42,31 @@ def checkout(request):
                     messages.error(request, "You don't have enough points for this redemption.")
                     return render(request, "orders/checkout.html", {"form": form, "cart": cart})
 
-            # Create order
+            # Calculate subtotal first
+            subtotal = Decimal("0")
+            for cart_item in cart.items.all():
+                item_total = cart_item.book.price * cart_item.quantity
+                subtotal += item_total
+
+            # Calculate final total after discount
+            final_total = subtotal - points_discount
+            if final_total < 0:
+                final_total = Decimal("0")  # Ensure total doesn't go negative
+
+            # Create order with discount information
             order = Order.objects.create(
                 customer=customer,
                 shipping_address=form.cleaned_data["shipping_address"],
                 payment_method=form.cleaned_data["payment_method"],
+                points_used=points_used,
+                points_discount=points_discount,
+                subtotal=subtotal,
+                total_amount=final_total,
             )
 
-            # Create order items from cart and calculate total
-            total_order_value = Decimal("0")
+            # Create order items from cart
             for cart_item in cart.items.all():
                 item_total = cart_item.book.price * cart_item.quantity
-                total_order_value += item_total
 
                 OrderItem.objects.create(
                     order=order,
@@ -72,11 +85,12 @@ def checkout(request):
                     points_used, f"Points redemption for Order #{order.id}", order=order
                 )
                 messages.success(
-                    request, f"You saved ${points_discount:.2f} using {points_used} points!"
+                    request,
+                    f"You saved ${points_discount:.2f} using {points_used} points! Final total: ${final_total:.2f}",
                 )
 
-            # Award points based on order value (1 point per $1 spent)
-            points_earned = int(total_order_value)
+            # Award points based on final amount paid (after discount)
+            points_earned = int(final_total)
             if points_earned > 0:
                 customer.add_points(
                     points_earned, f"Purchase reward for Order #{order.id}", order=order

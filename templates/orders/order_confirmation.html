@@ -35,6 +35,35 @@
                      <td class="py-3">${{ item.total_price }}</td>
                   </tr>
                {% endfor %}
+               <tr class="border-top">
+                  <td colspan="3" class="py-3">
+                     <strong>Subtotal:</strong>
+                  </td>
+                  <td class="py-3">
+                     <strong>${{ order.subtotal }}</strong>
+                  </td>
+               </tr>
+               {% if order.points_used > 0 %}
+                  <tr>
+                     <td colspan="3" class="py-3">
+                        <strong class="text-success">
+                           <i class="fas fa-star text-warning me-1"></i>
+                           Points Discount ({{ order.points_used }} points):
+                        </strong>
+                     </td>
+                     <td class="py-3">
+                        <strong class="text-success">-${{ order.points_discount }}</strong>
+                     </td>
+                  </tr>
+               {% endif %}
+               <tr class="border-top">
+                  <td colspan="3" class="py-3">
+                     <strong>Total Amount:</strong>
+                  </td>
+                  <td class="py-3">
+                     <strong>${{ order.total_amount }}</strong>
+                  </td>
+               </tr>
             </table>
          </div>
 

@@ -83,12 +83,28 @@
                         {% endfor %}
                      </tbody>
                      <tfoot>
+                        <tr class="subtotal-row">
+                           <td colspan="2">
+                              <strong>Subtotal:</strong>
+                           </td>
+                           <td class="text-right">
+                              <strong>${{ cart.total_price }}</strong>
+                           </td>
+                        </tr>
+                        <tr id="discount-row" style="display: none;">
+                           <td colspan="2">
+                              <strong class="text-success">Points Discount:</strong>
+                           </td>
+                           <td class="text-right">
+                              <strong class="text-success" id="discount-amount">-$0.00</strong>
+                           </td>
+                        </tr>
                         <tr class="total-row">
                            <td colspan="2">
                               <strong>Total:</strong>
                            </td>
                            <td class="text-right">
-                              <strong>${{ cart.total_price }}</strong>
+                              <strong id="final-total">${{ cart.total_price }}</strong>
                            </td>
                         </tr>
                      </tfoot>
@@ -109,7 +125,11 @@
       const pointsInput = document.getElementById('points-input');
       const pointsToUseInput = document.getElementById('id_points_to_use');
       const discountPreview = document.getElementById('discount-preview');
+      const discountRow = document.getElementById('discount-row');
+      const discountAmount = document.getElementById('discount-amount');
+      const finalTotal = document.getElementById('final-total');
       const availablePoints = {{ user.customer_profile.points|default:0 }};
+      const cartTotal = {{ cart.total_price }};
 
       usePointsCheckbox.addEventListener('change', function() {
          if (this.checked) {
@@ -119,6 +139,8 @@
             pointsInput.style.display = 'none';
             pointsToUseInput.value = 0;
             discountPreview.innerHTML = '';
+            discountRow.style.display = 'none';
+            finalTotal.textContent = `$${cartTotal.toFixed(2)}`;
          }
       });
 
@@ -128,14 +150,24 @@
          const pointsToUse = parseInt(pointsToUseInput.value) || 0;
          if (pointsToUse > 0) {
             const discount = (pointsToUse / 20).toFixed(2); // 100 points = $5, so 1 point = $0.05
+            const newTotal = Math.max(0, cartTotal - parseFloat(discount)).toFixed(2);
+            
+            // Update discount preview
             discountPreview.innerHTML = `
                <div class="alert alert-info">
                   <i class="fas fa-info-circle me-2"></i>
                   You will save <strong>$${discount}</strong> using ${pointsToUse} points
                </div>
             `;
+            
+            // Update order summary
+            discountRow.style.display = 'table-row';
+            discountAmount.textContent = `-$${discount}`;
+            finalTotal.textContent = `$${newTotal}`;
          } else {
             discountPreview.innerHTML = '';
+            discountRow.style.display = 'none';
+            finalTotal.textContent = `$${cartTotal.toFixed(2)}`;
          }
       }
 
