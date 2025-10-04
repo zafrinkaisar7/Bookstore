@@ -20,6 +20,46 @@
                   <h3 class="mb-4">Shipping Address</h3>
                   {{ form.shipping_address|as_crispy_field }}
                </div>
+
+               <!-- Points Redemption Section -->
+               {% if user.customer_profile.points > 0 %}
+                  <div class="form-section mb-5">
+                     <h3 class="mb-4">
+                        <i class="fas fa-star text-warning me-2"></i>
+                        Use Loyalty Points
+                     </h3>
+                     <div class="card border-warning">
+                        <div class="card-body">
+                           <div class="row align-items-center mb-3">
+                              <div class="col-md-6">
+                                 <p class="mb-0">
+                                    <strong>Available Points:</strong>
+                                    <span class="text-warning">{{ user.customer_profile.points }}</span>
+                                 </p>
+                                 <small class="text-muted">100 points = $5.00 discount</small>
+                              </div>
+                              <div class="col-md-6 text-end">
+                                 <div class="form-check form-switch">{{ form.use_points|as_crispy_field }}</div>
+                              </div>
+                           </div>
+
+                           <div id="points-input" style="display: none;">
+                              <div class="row">
+                                 <div class="col-md-8">{{ form.points_to_use|as_crispy_field }}</div>
+                                 <div class="col-md-4">
+                                    <div class="d-grid">
+                                       <button type="button"
+                                               class="btn btn-outline-warning btn-sm"
+                                               onclick="useMaxPoints()">Use Max</button>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div id="discount-preview" class="mt-2"></div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               {% endif %}
             </div>
 
             <div class="order-summary mb-5">
@@ -62,4 +102,63 @@
          </form>
       </div>
    </div>
+
+   <script>
+      // Points redemption functionality
+      const usePointsCheckbox = document.getElementById('id_use_points');
+      const pointsInput = document.getElementById('points-input');
+      const pointsToUseInput = document.getElementById('id_points_to_use');
+      const discountPreview = document.getElementById('discount-preview');
+      const availablePoints = {{ user.customer_profile.points|default:0 }};
+
+      usePointsCheckbox.addEventListener('change', function() {
+         if (this.checked) {
+            pointsInput.style.display = 'block';
+            updateDiscountPreview();
+         } else {
+            pointsInput.style.display = 'none';
+            pointsToUseInput.value = 0;
+            discountPreview.innerHTML = '';
+         }
+      });
+
+      pointsToUseInput.addEventListener('input', updateDiscountPreview);
+
+      function updateDiscountPreview() {
+         const pointsToUse = parseInt(pointsToUseInput.value) || 0;
+         if (pointsToUse > 0) {
+            const discount = (pointsToUse / 20).toFixed(2); // 100 points = $5, so 1 point = $0.05
+            discountPreview.innerHTML = `
+               <div class="alert alert-info">
+                  <i class="fas fa-info-circle me-2"></i>
+                  You will save <strong>$${discount}</strong> using ${pointsToUse} points
+               </div>
+            `;
+         } else {
+            discountPreview.innerHTML = '';
+         }
+      }
+
+      function useMaxPoints() {
+         pointsToUseInput.value = availablePoints;
+         updateDiscountPreview();
+      }
+
+      // Form validation
+      document.querySelector('form').addEventListener('submit', function(e) {
+         if (usePointsCheckbox.checked) {
+            const pointsToUse = parseInt(pointsToUseInput.value) || 0;
+            if (pointsToUse > availablePoints) {
+               e.preventDefault();
+               alert('You cannot use more points than you have available.');
+               return false;
+            }
+            if (pointsToUse <= 0) {
+               e.preventDefault();
+               alert('Please enter a valid number of points to use.');
+               return false;
+            }
+         }
+      });
+   </script>
 {% endblock content %}

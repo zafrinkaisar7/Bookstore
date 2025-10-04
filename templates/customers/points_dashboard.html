@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Points Dashboard - GreenBook{% endblock %}
+
+{% block content %}
+   <div class="container-fluid">
+      <!-- Header Section -->
+      <div class="row mb-4">
+         <div class="col-12">
+            <div class="card border-0 shadow-sm">
+               <div class="card-body text-center py-5">
+                  <div class="d-flex justify-content-center align-items-center mb-3">
+                     <i class="fas fa-star text-warning me-3" style="font-size: 3rem;"></i>
+                     <div>
+                        <h1 class="display-4 mb-0">{{ customer.points }}</h1>
+                        <p class="lead text-muted mb-0">Loyalty Points</p>
+                     </div>
+                  </div>
+                  <p class="text-muted">Earn points with every purchase and redeem them for discounts!</p>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="row">
+         <!-- Points Statistics -->
+         <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+               <div class="card-header bg-primary text-white">
+                  <h5 class="mb-0">
+                     <i class="fas fa-chart-line me-2"></i>Points Statistics
+                  </h5>
+               </div>
+               <div class="card-body">
+                  <div class="row text-center">
+                     <div class="col-6">
+                        <div class="border-end">
+                           <h3 class="text-success mb-1">{{ total_earned }}</h3>
+                           <small class="text-muted">Total Earned</small>
+                        </div>
+                     </div>
+                     <div class="col-6">
+                        <h3 class="text-danger mb-1">{{ total_spent }}</h3>
+                        <small class="text-muted">Total Spent</small>
+                     </div>
+                  </div>
+                  <hr />
+                  <div class="text-center">
+                     <h4 class="text-primary mb-1">{{ customer.points }}</h4>
+                     <small class="text-muted">Available Points</small>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- Available Discounts -->
+         <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+               <div class="card-header bg-success text-white">
+                  <h5 class="mb-0">
+                     <i class="fas fa-gift me-2"></i>Available Rewards
+                  </h5>
+               </div>
+               <div class="card-body">
+                  <div class="row">
+                     {% for discount in available_discounts %}
+                        <div class="col-md-6 mb-3">
+                           <div class="card {% if discount.can_afford %}border-success{% else %}border-secondary{% endif %}">
+                              <div class="card-body text-center">
+                                 <h5 class="card-title">
+                                    <i class="fas fa-tag text-primary me-2"></i>
+                                    ${{ discount.discount_amount }} OFF
+                                 </h5>
+                                 <p class="card-text">
+                                    <strong>{{ discount.points_needed }} points</strong>
+                                 </p>
+                                 {% if discount.can_afford %}
+                                    <span class="badge bg-success">Available</span>
+                                 {% else %}
+                                    <span class="badge bg-secondary">Need {{ discount.points_short }} more points</span>
+                                 {% endif %}
+                              </div>
+                           </div>
+                        </div>
+                     {% endfor %}
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Transaction History -->
+      <div class="row">
+         <div class="col-12">
+            <div class="card">
+               <div class="card-header bg-info text-white">
+                  <h5 class="mb-0">
+                     <i class="fas fa-history me-2"></i>Recent Transactions
+                  </h5>
+               </div>
+               <div class="card-body">
+                  {% if recent_transactions %}
+                     <div class="table-responsive">
+                        <table class="table table-hover">
+                           <thead>
+                              <tr>
+                                 <th>Date</th>
+                                 <th>Type</th>
+                                 <th>Description</th>
+                                 <th>Points</th>
+                                 <th>Order</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {% for transaction in recent_transactions %}
+                                 <tr>
+                                    <td>{{ transaction.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                       <span class="badge {% if transaction.transaction_type == 'earned' %}bg-success {% elif transaction.transaction_type == 'spent' %}bg-danger {% elif transaction.transaction_type == 'bonus' %}bg-warning {% else %}bg-secondary{% endif %}">
+                                          {{ transaction.get_transaction_type_display }}
+                                       </span>
+                                    </td>
+                                    <td>{{ transaction.description }}</td>
+                                    <td>
+                                       <span class="{% if transaction.points > 0 %}text-success{% else %}text-danger{% endif %}">
+                                          {% if transaction.points > 0 %}+{% endif %}
+                                          {{ transaction.points }}
+                                       </span>
+                                    </td>
+                                    <td>
+                                       {% if transaction.order %}
+                                          <a href="#" class="text-decoration-none">Order #{{ transaction.order.id }}</a>
+                                       {% else %}
+                                          <span class="text-muted">-</span>
+                                       {% endif %}
+                                    </td>
+                                 </tr>
+                              {% endfor %}
+                           </tbody>
+                        </table>
+                     </div>
+                  {% else %}
+                     <div class="text-center py-4">
+                        <i class="fas fa-receipt text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">No transactions yet. Start shopping to earn points!</p>
+                        <a href="{% url 'book_list' %}" class="btn btn-primary">
+                           <i class="fas fa-shopping-bag me-2"></i>Browse Books
+                        </a>
+                     </div>
+                  {% endif %}
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- How Points Work -->
+      <div class="row mt-4">
+         <div class="col-12">
+            <div class="card">
+               <div class="card-header bg-secondary text-white">
+                  <h5 class="mb-0">
+                     <i class="fas fa-info-circle me-2"></i>How Points Work
+                  </h5>
+               </div>
+               <div class="card-body">
+                  <div class="row">
+                     <div class="col-md-4 text-center mb-3">
+                        <div class="p-3">
+                           <i class="fas fa-shopping-cart text-primary mb-3"
+                              style="font-size: 2rem"></i>
+                           <h6>Earn Points</h6>
+                           <p class="text-muted small">Get 1 point for every $1 spent on books</p>
+                        </div>
+                     </div>
+                     <div class="col-md-4 text-center mb-3">
+                        <div class="p-3">
+                           <i class="fas fa-star text-warning mb-3" style="font-size: 2rem;"></i>
+                           <h6>Accumulate</h6>
+                           <p class="text-muted small">Points never expire and accumulate over time</p>
+                        </div>
+                     </div>
+                     <div class="col-md-4 text-center mb-3">
+                        <div class="p-3">
+                           <i class="fas fa-gift text-success mb-3" style="font-size: 2rem;"></i>
+                           <h6>Redeem</h6>
+                           <p class="text-muted small">Use points at checkout for instant discounts</p>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <style>
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.badge {
+    font-size: 0.8rem;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.display-4 {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+   </style>
+{% endblock content %}

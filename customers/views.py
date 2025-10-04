@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Sum
 from books.models import Book
-from customers.models import Cart, CartItem
+from customers.models import Cart, CartItem, Customer, PointsTransaction
 
 
 # Create your views here.
@@ -29,7 +30,7 @@ def add_to_cart(request, pk):
         cart_item.quantity += 1
     cart_item.save()
 
-    # Update cart totals
+    # Update carts total prices and items
     cart.total_items = cart.items.count()
     cart.total_price = sum(item.book.price * item.quantity for item in cart.items.all())
     cart.save()
@@ -49,10 +50,72 @@ def update_quantity(request, pk):
         cart_item.quantity += 1 if action == "increase" else -1
         cart_item.save()
 
-    # Update cart totals
+    # Update carts total prices and items
     cart = cart_item.cart
     cart.total_items = cart.items.count()
     cart.total_price = sum(item.book.price * item.quantity for item in cart.items.all())
     cart.save()
 
     return redirect("cart")
+
+
+@login_required
+def points_dashboard(request):
+    """Display user's points dashboard with transaction history and rewards"""
+    customer, created = Customer.objects.get_or_create(user=request.user)
+
+    # Get recent transactions
+    recent_transactions = PointsTransaction.objects.filter(customer=customer)[:10]
+
+    # Calculate points statistics
+    total_earned = (
+        PointsTransaction.objects.filter(
+            customer=customer, transaction_type__in=["earned", "bonus"]
+        ).aggregate(total=Sum("points"))["total"]
+        or 0
+    )
+
+    total_spent = abs(
+        PointsTransaction.objects.filter(customer=customer, transaction_type="spent").aggregate(
+            total=Sum("points")
+        )["total"]
+        or 0
+    )
+
+    # Calculate available discount amounts
+    points_to_discount = {
+        100: 5.00,  # 100 points = $5 discount
+        200: 12.00,  # 200 points = $12 discount
+        500: 35.00,  # 500 points = $35 discount
+        1000: 80.00,  # 1000 points = $80 discount
+    }
+
+    available_discounts = []
+    for points_needed, discount_amount in points_to_discount.items():
+        if customer.points >= points_needed:
+            available_discounts.append(
+                {
+                    "points_needed": points_needed,
+                    "discount_amount": discount_amount,
+                    "can_afford": True,
+                }
+            )
+        else:
+            available_discounts.append(
+                {
+                    "points_needed": points_needed,
+                    "discount_amount": discount_amount,
+                    "can_afford": False,
+                    "points_short": points_needed - customer.points,
+                }
+            )
+
+    context = {
+        "customer": customer,
+        "recent_transactions": recent_transactions,
+        "total_earned": total_earned,
+        "total_spent": total_spent,
+        "available_discounts": available_discounts,
+    }
+
+    return render(request, "customers/points_dashboard.html", context)
