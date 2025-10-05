@@ -36,8 +36,8 @@
          </form>
       </div>
    </td>
-   <td class="align-middle">${{ item.book.price }}</td>
-   <td class="align-middle">${{ item.book.price|multiply:item.quantity }}</td>
+   <td class="align-middle">৳{{ item.book.price }}</td>
+   <td class="align-middle">৳{{ item.book.price|multiply:item.quantity }}</td>
    <td class="align-middle">
       <form action="{% url 'update_quantity' item.id %}" method="post">
          {% csrf_token %}

@@ -32,18 +32,32 @@
                   <h3 class="text-muted mb-4">by {{ book.author }}</h3>
 
                   <div class="book-meta mb-4">
-                     <span class="badge bg-primary me-2">{{ book.category.name|default:"Uncategorized" }}</span>
-                     <span class="badge bg-{% if book.stock > 2 %}success{% else %}danger{% endif %}">
-                        {% if book.stock > 2 %}
-                           In Stock
-                        {% else %}
-                           Out of Stock
-                        {% endif %}
-                     </span>
+                     <div class="row">
+                        <div class="col-md-6">
+                           <div class="meta-item">
+                              <i class="fas fa-tag text-primary me-2"></i>
+                              <strong>Genre:</strong>
+                              <span class="text-muted">{{ book.category.name|default:"Uncategorized" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-6">
+                           <div class="meta-item">
+                              <i class="fas fa-{% if book.stock > 2 %}check-circle text-success{% else %}times-circle text-danger{% endif %} me-2"></i>
+                              <strong>Availability:</strong>
+                              <span class="{% if book.stock > 2 %}text-success{% else %}text-danger{% endif %}">
+                                 {% if book.stock > 2 %}
+                                    In Stock ({{ book.stock }} available)
+                                 {% else %}
+                                    Out of Stock
+                                 {% endif %}
+                              </span>
+                           </div>
+                        </div>
+                     </div>
                   </div>
 
                   <div class="book-price mb-4">
-                     <h2 class="text-primary">${{ book.price }}</h2>
+                     <h2 class="text-primary">৳{{ book.price }}</h2>
                   </div>
 
                   <p class="card-text book-description">{{ book.description }}</p>
@@ -136,9 +150,24 @@
          border-radius: 4px;
       }
 
-      .book-meta .badge {
-         font-size: 1rem;
-         padding: 0.5em 1em;
+      .meta-item {
+         padding: 0.75rem 0;
+         border-bottom: 1px solid #e9ecef;
+         margin-bottom: 0.5rem;
+      }
+      
+      .meta-item:last-child {
+         border-bottom: none;
+         margin-bottom: 0;
+      }
+      
+      .meta-item i {
+         font-size: 1.1rem;
+      }
+      
+      .meta-item strong {
+         color: var(--text-color);
+         font-weight: 600;
       }
 
       .book-description {

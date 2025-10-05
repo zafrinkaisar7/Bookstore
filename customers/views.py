@@ -84,10 +84,10 @@ def points_dashboard(request):
 
     # Calculate available discount amounts
     points_to_discount = {
-        100: 5.00,  # 100 points = $5 discount
-        200: 12.00,  # 200 points = $12 discount
-        500: 35.00,  # 500 points = $35 discount
-        1000: 80.00,  # 1000 points = $80 discount
+        100: 5.00,  # 100 points = ৳5 discount
+        200: 12.00,  # 200 points = ৳12 discount
+        500: 35.00,  # 500 points = ৳35 discount
+        1000: 80.00,  # 1000 points = ৳80 discount
     }
 
     available_discounts = []

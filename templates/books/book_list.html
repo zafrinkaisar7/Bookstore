@@ -47,7 +47,7 @@
                            <p class="card-text text-muted mb-2">{{ book.author|truncatechars:20 }}</p>
                            <div class="d-flex justify-content-between align-items-center mb-2">
                               <span class="badge bg-light text-dark">{{ book.category.name|default:"Uncategorized"|truncatechars:15 }}</span>
-                              <span class="text-primary fw-bold">${{ book.price }}</span>
+                              <span class="text-primary fw-bold">৳{{ book.price }}</span>
                            </div>
                            <div class="d-flex justify-content-between align-items-center">
                               {% if book.stock > 2 %}

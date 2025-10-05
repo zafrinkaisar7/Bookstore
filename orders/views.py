@@ -86,7 +86,7 @@ def checkout(request):
                 )
                 messages.success(
                     request,
-                    f"You saved ${points_discount:.2f} using {points_used} points! Final total: ${final_total:.2f}",
+                    f"You saved ৳{points_discount:.2f} using {points_used} points! Final total: ৳{final_total:.2f}",
                 )
 
             # Award points based on final amount paid (after discount)

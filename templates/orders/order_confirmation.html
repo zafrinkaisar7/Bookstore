@@ -31,8 +31,8 @@
                   <tr>
                      <td class="py-3">{{ item.book.title }}</td>
                      <td class="py-3">{{ item.quantity }}</td>
-                     <td class="py-3">${{ item.price }}</td>
-                     <td class="py-3">${{ item.total_price }}</td>
+                     <td class="py-3">৳{{ item.price }}</td>
+                     <td class="py-3">৳{{ item.total_price }}</td>
                   </tr>
                {% endfor %}
                <tr class="border-top">
@@ -40,7 +40,7 @@
                      <strong>Subtotal:</strong>
                   </td>
                   <td class="py-3">
-                     <strong>${{ order.subtotal }}</strong>
+                     <strong>৳{{ order.subtotal }}</strong>
                   </td>
                </tr>
                {% if order.points_used > 0 %}
@@ -52,7 +52,7 @@
                         </strong>
                      </td>
                      <td class="py-3">
-                        <strong class="text-success">-${{ order.points_discount }}</strong>
+                        <strong class="text-success">-৳{{ order.points_discount }}</strong>
                      </td>
                   </tr>
                {% endif %}
@@ -61,7 +61,7 @@
                      <strong>Total Amount:</strong>
                   </td>
                   <td class="py-3">
-                     <strong>${{ order.total_amount }}</strong>
+                     <strong>৳{{ order.total_amount }}</strong>
                   </td>
                </tr>
             </table>
