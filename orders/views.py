@@ -42,6 +42,21 @@ def checkout(request):
                     messages.error(request, "You don't have enough points for this redemption.")
                     return render(request, "orders/checkout.html", {"form": form, "cart": cart})
 
+            # Validate stock availability before processing order
+            for cart_item in cart.items.all():
+                if cart_item.quantity > cart_item.book.stock:
+                    messages.error(
+                        request,
+                        f"Sorry, only {cart_item.book.stock} copies of {cart_item.book.title} are available. Please update your cart.",
+                    )
+                    return render(request, "orders/checkout.html", {"form": form, "cart": cart})
+                elif cart_item.book.stock <= 2:
+                    messages.error(
+                        request,
+                        f"Sorry, {cart_item.book.title} is currently out of stock. Please remove it from your cart.",
+                    )
+                    return render(request, "orders/checkout.html", {"form": form, "cart": cart})
+
             # Calculate subtotal first
             subtotal = Decimal("0")
             for cart_item in cart.items.all():

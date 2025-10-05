@@ -20,20 +20,33 @@ def cart(request):
 def add_to_cart(request, pk):
     book = get_object_or_404(Book, pk=pk)
 
+    # Check if book is in stock
+    if book.stock <= 2:
+        messages.error(request, f"Sorry, {book.title} is currently out of stock.")
+        return redirect("book_detail", book_id=pk)
+
     # Get or create cart for the user
     cart, created = Cart.objects.get_or_create(user=request.user)
 
     # Get or create cart item
     cart_item, created = CartItem.objects.get_or_create(cart=cart, book=book)
 
+    # Check if adding this item would exceed available stock
     if not created:
+        if cart_item.quantity + 1 > book.stock:
+            messages.error(
+                request, f"Sorry, only {book.stock} copies of {book.title} are available."
+            )
+            return redirect("book_detail", book_id=pk)
         cart_item.quantity += 1
-    cart_item.save()
+    else:
+        # For new cart items, check if at least 1 copy is available
+        if book.stock < 1:
+            messages.error(request, f"Sorry, {book.title} is currently out of stock.")
+            return redirect("book_detail", book_id=pk)
+        cart_item.quantity = 1
 
-    # Update carts total prices and items
-    cart.total_items = cart.items.count()
-    cart.total_price = sum(item.book.price * item.quantity for item in cart.items.all())
-    cart.save()
+    cart_item.save()
 
     messages.success(request, f"{book.title} added to cart!")
     return redirect("book_detail", book_id=pk)
@@ -47,14 +60,24 @@ def update_quantity(request, pk):
     if action == "delete":
         cart_item.delete()
     else:
-        cart_item.quantity += 1 if action == "increase" else -1
-        cart_item.save()
+        if action == "increase":
+            # Check if increasing quantity would exceed available stock
+            if cart_item.quantity + 1 > cart_item.book.stock:
+                messages.error(
+                    request,
+                    f"Sorry, only {cart_item.book.stock} copies of {cart_item.book.title} are available.",
+                )
+                return redirect("cart")
+            cart_item.quantity += 1
+        else:  # decrease
+            cart_item.quantity -= 1
+            # Remove item if quantity becomes 0 or negative
+            if cart_item.quantity <= 0:
+                cart_item.delete()
+                messages.success(request, f"{cart_item.book.title} removed from cart.")
+                return redirect("cart")
 
-    # Update carts total prices and items
-    cart = cart_item.cart
-    cart.total_items = cart.items.count()
-    cart.total_price = sum(item.book.price * item.quantity for item in cart.items.all())
-    cart.save()
+        cart_item.save()
 
     return redirect("cart")
 

@@ -81,9 +81,12 @@
                                  <i class="fas fa-shopping-cart"></i> Add to Cart
                               </a>
                            {% else %}
-                              <button class="btn btn-outline-dark" disabled>
-                                 <i class="fas fa-shopping-cart"></i> Out of Stock
-                              </button>
+                              <div class="alert alert-warning">
+                                 <i class="fas fa-exclamation-triangle me-2"></i>
+                                 <strong>Out of Stock</strong>
+                                 <br />
+                                 <small>This book is currently unavailable for purchase. You can still view the details and reviews.</small>
+                              </div>
                            {% endif %}
                         {% endif %}
                      {% else %}
